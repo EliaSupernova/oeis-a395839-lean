@@ -1,0 +1,25 @@
+name = "OeisA395839"
+version = "0.1.0"
+defaultTargets = ["Challenge", "Solution"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.35.0-rc2"
+
+[[lean_lib]]
+name = "Challenge"
+roots = ["Challenge"]
+# `Challenge.lean` states the theorem with one deliberate `sorry`, as Comparator
+# requires. Only that warning, and only for this library, is switched off, so that
+# `lake --wfail build` still rejects any `sorry` in the proof (`Solution.lean`).
+[lean_lib.leanOptions]
+warn.sorry = false
+
+[[lean_lib]]
+name = "Solution"
+roots = ["Solution"]

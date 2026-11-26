@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "The parity and mod-3 conjectures of OEIS A395839"
+  description: >-
+    OEIS A395839 has generating function 10*C(x)^2 - C(x), where C(x) is the
+    generating function of the Catalan numbers (A000108). The entry, by Paul D.
+    Hanna (May 2026), records two conjectures: a(n) is odd if and only if
+    n = 2^k - 1 for some k >= 0; and a(3n+1) == C(n) (mod 3) with
+    a(3n) == a(3n+2) == 0 (mod 3) for all n >= 0. This repository gives a Lean 4
+    and Mathlib proof of both. The sequence is defined in Lean as the
+    coefficients of 10*C(x)^2 - C(x) in the ring of formal power series over
+    the integers. Both statements follow quickly from classical facts about
+    Catalan numbers modulo 2 and 3; no novelty is claimed.
+  authors:
+    - "EliaSupernova"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "EliaSupernova"
+
+classification:
+  arxiv: ["math.CO", "math.NT"]
+  msc2020: ["05A15", "11B50", "11B65"]
+
+sources:
+  - title: "OEIS A395839: G.f. 10*C(x)^2 - C(x), where C(x) = 1 + x*C(x)^2 is the g.f. of the Catalan numbers (A000108)"
+    authors:
+      - "Paul D. Hanna"
+    contributors:
+      - name: "Paul D. Hanna"
+        role: "author of the OEIS sequence entry"
+    id: "https://oeis.org/A395839"
+    type: "other"
+    location: "Comments section, the two comments beginning \"Conjecture:\"; entry revision #37 of May 18 2026"
+    relationship: "formalizes"
+    note: >-
+      The entry states both properties as conjectures, without proof. This
+      repository formalizes both statements and proves them. The entry text was
+      read from oeis.org on 26 November 2026.
+    license: "OEIS End-User License Agreement (https://oeis.org/LICENSE)"
+    author_endorsement: "not-contacted"
+
+  - title: "OEIS A000108: Catalan numbers"
+    authors:
+      - "N. J. A. Sloane"
+    contributors:
+      - name: "OEIS contributors"
+        role: "editors of the sequence entry"
+    id: "https://oeis.org/A000108"
+    type: "other"
+    location: "Sequence entry"
+    relationship: "background"
+    note: >-
+      The Catalan numbers used in the definition. In Lean they are Mathlib's
+      catalan, defined by the recurrence C(0) = 1,
+      C(n+1) = sum over i <= n of C(i) C(n-i).
+    license: "OEIS End-User License Agreement (https://oeis.org/LICENSE)"
+    author_endorsement: "not-contacted"
+
+  - title: "Congruences for Catalan and Motzkin numbers and related sequences"
+    authors:
+      - "Emeric Deutsch"
+      - "Bruce E. Sagan"
+    id: "https://doi.org/10.1016/j.jnt.2005.06.005"
+    type: "paper"
+    location: "Journal of Number Theory 117 (2006), 191-215"
+    relationship: "background"
+    note: >-
+      Literature on Catalan numbers modulo 2 and 3, the facts from which both
+      conjectures follow. Only the bibliographic record was checked (via
+      Crossref); the paper itself was not read for this repository and is not
+      used in the Lean proof.
+
+related_formalizations: []
+
+status:
+  scope: >-
+    Formalized and proved: both conjectures in OEIS A395839 for all n >= 0,
+    with a(n) defined as the coefficient of x^n in 10*C(x)^2 - C(x) over the
+    integers. Also proved, as fidelity checks in Solution.lean: C(x) = 1 + x*C(x)^2,
+    the closed form a(n) = 10*C(n+1) - C(n), and the first nine terms of the
+    OEIS data. Not formalized: the other formulas and the 10-adic comments in
+    the entry.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+
+automation:
+  methods:
+    - method: "agent"
+      models:
+        - "Claude Opus 5.5"
+        - "Claude Sonnet 5.5"
+      framework: "Claude Code"
+      tool_setup: >-
+        EliaSupernova supplied a task brief that included the OEIS statement and
+        a proof sketch (reduce a(n) to the Catalan numbers modulo 2 and 3, and
+        use that F(x)^p = F(x^p) for power series in characteristic p). An AI
+        agent (Claude Opus 5.5 in Claude Code) wrote the Lean statements and
+        proof, using Mathlib's FiniteField.PowerSeries.expand_card for the
+        Frobenius step, assembled this repository from the PalomarTemplate
+        layout, and drafted the metadata and README. A second AI agent (Claude
+        Sonnet 5.5 in Claude Code) ran the final local checks and made the
+        commit.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+  spend_usd: "not tracked"
+  notes: >-
+    EliaSupernova directed an AI agent, which produced the proof and this
+    packaging. Correctness of the proof rests on Lean's kernel and the
+    independent kernels run by lake comparator, not on the model.
+
+fidelity:
+  divergences: >-
+    The OEIS name defines the sequence by the generating function
+    10*C(x)^2 - C(x) with C(x) = 1 + x*C(x)^2. In Lean, C is the power series
+    whose n-th coefficient is Mathlib's catalan n, and a n is the n-th
+    coefficient of 10 * C ^ 2 - C; the functional equation C = 1 + X * C ^ 2 is
+    proved (OeisA395839.C_eq) rather than used as the definition. a n has type
+    Int, so the statement does not rely on the sequence being nonnegative.
+    "n is of the form 2^k - 1 (k >= 0)" is rendered as an existential over a
+    natural number k, with natural-number subtraction, which is exact since
+    2^k >= 1. "== (mod 3)" is rendered as Int.ModEq 3, and A000108(n) as
+    catalan n cast to Int. The two equalities a(3n) == 0 and a(3n+2) == 0 are
+    stated separately.
+
+review:
+  status: "unchecked"
+  reviewers:
+    - "none"
+  notes: >-
+    No independent human mathematical review of the proof, the statement
+    alignment or the literature account is claimed. Checks run before
+    submission were mechanical: a Lean build that fails on warnings, lake
+    comparator with the toolchain's bundled kernels, an axiom report, and a
+    numerical check of both conjectures for n < 3000. No systematic literature
+    search was made.
+
+alignment:
+  namespace: "OeisA395839"
+  statements:
+    - source: "OEIS A395839, first comment: a(n) is odd iff n is of the form 2^k - 1 (k >= 0)"
+      lean: "OeisA395839.conjecture_1"
+      module: "Solution"
+      status: "proved"
+      note: "Stated in Challenge.lean and proved in Solution.lean, for every natural number n."
+    - source: "OEIS A395839, second comment: a(3n+1) == A000108(n) (mod 3), a(3n) == a(3n+2) == 0 (mod 3)"
+      lean: "OeisA395839.conjecture_2"
+      module: "Solution"
+      status: "proved"
+      note: "Stated in Challenge.lean and proved in Solution.lean, for every natural number n."
+
+acknowledgements: >-
+  Paul D. Hanna for the sequence and the conjectures; the OEIS; the Lean and
+  Mathlib communities, in particular the authors of Mathlib's power series
+  expansion and Catalan number files; and the Palomar template.
